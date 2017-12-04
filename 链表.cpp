@@ -37,14 +37,21 @@ status ListTrabverse(ListHead L);  //简化过
 int read_data(void);
 int save_data(void);
 int main(void){
-    FILE *_fp=fopen(".\\data.bin","rb");
-    if(_fp==NULL)
+    int option;
+    system("cls");
+    printf("是否读取文件？(0:不读取,1:读取)");
+    scanf("%d",&option);
+    if(option==1)
     {
-        printf("File open error\n");
-        return ERROR;
+        FILE *_fp=fopen(".\\data.bin","rb");
+        if(_fp==NULL)
+        {
+            printf("File open error\n");
+            return ERROR;
+        }
+        fclose(_fp);
+        read_data();
     }
-    fclose(_fp);
-    read_data();
 	int op=1;
 	ElemType e=0,pre_e=0,next_e=0;
     while(op){
@@ -195,7 +202,11 @@ int main(void){
 		}//end of switch
 	}//end of while
     //save_data();
-    save_data();
+    system("cls");
+    printf("退出前是否保存？(0:不保存,1:保存)");
+    scanf("%d",&option);
+    if(option==1)
+        save_data();
   	printf("欢迎下次再使用本系统！\n");
 }//end of main()
 status IntiaList(ListHead &L){
@@ -438,6 +449,7 @@ status ListTrabverse(ListHead L){
 }
 int read_data(){
     int amount=0;
+    int length=0;
     FILE *fp=NULL;
     fp=fopen(".\\data.bin","rb");
     if(!feof(fp)){
@@ -446,17 +458,20 @@ int read_data(){
         {
             fread(&data[i],sizeof(ListHead),1,fp);
             SqList *q = NULL,*p = NULL;
-            q=(SqList*)malloc(sizeof(SqList));
-            fread(q,sizeof(SqList),1,fp);
-            if(i==0){
-                data[i].next=q;
-                p=q;
-                q=NULL;
-            }
-            else{
-                p->next=q;
-                p=p->next;
-                q=NULL;
+            while(length<data[i].length){
+                q=(SqList*)malloc(sizeof(SqList));
+                fread(q,sizeof(SqList),1,fp);
+                if(length==0){
+                    data[i].next=q;
+                    p=q;
+                    q=NULL;
+                }
+                else{
+                    p->next=q;
+                    p=q;
+                    q=NULL;
+                }
+                length++;
             }
         }
     }
