@@ -15,32 +15,39 @@ typedef char TElemType;   /*数据元素类型定义*/
 
 #define LIST_INIT_SIZE 100  //索引表初始大小
 #define LISTINCREMENT 10    //索引表扩大增量
+
+//二叉树链式存储结构
 typedef struct BiTNode {
     TElemType data;
-    int num;
+    int key;
     struct BiTNode *lchild, *rchild;
 } BiTNode, *BiTree;
+
+//二叉树信息结构
 typedef struct {
     char name[40];
     BiTree T;
 } InfoNode;
+
+//索引表结构
 typedef struct {
     InfoNode * elem;
     int length;
     int size;
-} IndexNode;
-status InitBiTree(IndexNode &P, char *name);
-status DestroyBiTree(IndexNode &P, char *name);
+} PNode;
+
+status InitBiTree(PNode &P, char *name);
+status DestroyBiTree(PNode &P, char *name);
 status CreateBiTree(BiTree &T, char *definition, int &index);
 status ClearBiTree(BiTree &T);
 status BiTreeEmpty(BiTree T);
 int BiTreeDepth(BiTree T);
 status Root(BiTree T, TElemType &e);
-BiTNode *Value(BiTree T, int index);
-status Assign(BiTree T, TElemType &e, TElemType value);
+BiTNode *Value(BiTree T, int x);
+status Assign(BiTree T, int x, TElemType value);
 BiTNode *Parent(BiTree T, TElemType e);
-BiTNode *LeftChild(BiTree T, TElemType e);
-BiTNode *RightChild(BiTree T, TElemType e);
+BiTNode *LeftChild(BiTree T, int x);
+BiTNode *RightChild(BiTree T, int x);
 BiTNode *LeftSibling(BiTree T, TElemType e);
 BiTNode *RightSibling(BiTree T, TElemType e);
 status InsertChild(BiTree T, BiTNode *p, int LR, BiTree c);
@@ -50,27 +57,33 @@ status InOrderTraverse(BiTree T);
 status PostOrderTraverse(BiTree T);
 status LevelOrderTraverse(BiTree T);
 status Display(BiTree T, int depth);
-InfoNode *SearchBiTree(IndexNode P, char *name);
-status LoadFile(IndexNode &P, char *filename);
-status SaveFile(IndexNode P, char *filename);
+InfoNode *SearchBiTree(PNode P, char *name);
+status LoadFile(PNode &P, char *filename);
+status SaveFile(PNode P, char *filename);
 status fprintfDefinition(BiTree T, FILE *fp);
+
+
 int main(int argc, char *argv[])
 {
-    char fileName[40];
-    char treeName[40];
-    IndexNode P;
-    InfoNode *I;
-    BiTree T = NULL;
-    BiTree c;
-    BiTNode *node = NULL;
+    char fileName[40];      //文件名
+    char treeName[40];      //二叉树名称
+    PNode P;                //索引表结构
+    InfoNode *I;            //二叉树信息结构
+    BiTree T = NULL;        //二叉树
+    BiTree c;               //子树
+    BiTNode *node = NULL;   //二叉树结点
     TElemType e, e2;
-    char definition[256];
+    char definition[256];   //二叉树定义
     int index = 0;
-    int LR;
+    int LR;                 //0为左，1为右
+
+    //初始化索引表
     P.elem = (InfoNode *)malloc(sizeof(InfoNode) * LIST_INIT_SIZE);
     P.size = LIST_INIT_SIZE;
     P.length = 0;
-    printf("是否读取文件？[n]/y\n");
+
+    //用户指定文件对二叉树初始化
+    printf("是否指定文件对二叉树初始化？[n]/y\n");
     if (getchar() == 'y')
     {
 
@@ -86,6 +99,8 @@ int main(int argc, char *argv[])
         }
         system("pause");
     }
+
+    //对二叉树操作
     int op = 1;
     while (op)
     {
@@ -110,6 +125,7 @@ int main(int argc, char *argv[])
         getchar();
         switch (op)
         {
+            /*初始化二叉树*/
         case 1:
             printf("Please input tree name:");
             scanf("%s", treeName);
@@ -123,6 +139,8 @@ int main(int argc, char *argv[])
             }
             system("pause");
             break;
+
+            /*销毁二叉树*/
         case 2:
             printf("Please input tree name:");
             scanf("%s", treeName);
@@ -136,7 +154,10 @@ int main(int argc, char *argv[])
             }
             system("pause");
             break;
+
+            /*创建二叉树*/
         case 3:
+            index=0;
             printf("Please input tree name:");
             scanf("%s", treeName);
             getchar();
@@ -155,6 +176,8 @@ int main(int argc, char *argv[])
             }
             system("pause");
             break;
+
+            /*清空二叉树*/
         case 4:
             printf("Please input tree name:");
             scanf("%s", treeName);
@@ -171,6 +194,8 @@ int main(int argc, char *argv[])
             }
             system("pause");
             break;
+
+            /*二叉树是否为空*/
         case 5:
             printf("Please input tree name:");
             scanf("%s", treeName);
@@ -187,6 +212,8 @@ int main(int argc, char *argv[])
             }
             system("pause");
             break;
+
+            /*二叉树深度*/
         case 6:
             printf("Please input tree name:");
             scanf("%s", treeName);
@@ -196,6 +223,8 @@ int main(int argc, char *argv[])
             }
             system("pause");
             break;
+
+            /*二叉树的根*/
         case 7:
             printf("Please input tree name:");
             scanf("%s", treeName);
@@ -212,15 +241,16 @@ int main(int argc, char *argv[])
             }
             system("pause");
             break;
+
+            /*找到结点(Value)*/
         case 8:
-            int x;
             printf("Please input tree name:");
             scanf("%s", treeName);
             getchar();
             if (I = SearchBiTree(P, treeName))
             {
                 printf("请输入元素索引：");
-                scanf("%d",&x);
+                int x;scanf("%d",&x);
                 if (node = Value(I->T, x))
                 {
                     printf("已找到该结点，其值为%c.\n", node->data);
@@ -232,18 +262,20 @@ int main(int argc, char *argv[])
             }
             system("pause");
             break;
+
+            /*给结点赋值*/
         case 9:
             printf("Please input tree name:");
             scanf("%s", treeName);
             getchar();
             if (I = SearchBiTree(P, treeName))
             {
-                printf("请输入原始元素值：");
-                e = getchar();
+                printf("请输入索引值：");
+                int x;scanf("%d",&x);
                 getchar();
                 printf("请输入新的元素值：");
                 e2 = getchar();
-                if (Assign(I->T, e, e2))
+                if (Assign(I->T, x, e2))
                 {
                     printf("赋值成功。\n");
                 }
@@ -254,6 +286,8 @@ int main(int argc, char *argv[])
             }
             system("pause");
             break;
+
+            /*找到结点的父母*/
         case 10:
             printf("Please input tree name:");
             scanf("%s", treeName);
@@ -273,15 +307,17 @@ int main(int argc, char *argv[])
             }
             system("pause");
             break;
+
+            /*寻找左孩子*/
         case 11:
             printf("Please input tree name:");
             scanf("%s", treeName);
             getchar();
             if (I = SearchBiTree(P, treeName))
             {
-                printf("请输入元素值：");
-                e = getchar();
-                if (node = LeftChild(I->T, e))
+                printf("请输入索引值：");
+                int x;scanf("%d",&x);
+                if (node = LeftChild(I->T, x))
                 {
                     printf("左孩子的值为%c.\n", node->data);
                 }
@@ -292,15 +328,17 @@ int main(int argc, char *argv[])
             }
             system("pause");
             break;
+
+            /*寻找右孩子*/
         case 12:
             printf("Please input tree name:");
             scanf("%s", treeName);
             getchar();
             if (I = SearchBiTree(P, treeName))
             {
-                printf("请输入元素值：");
-                e = getchar();
-                if (node = RightChild(I->T, e))
+                printf("请输入索引值：");
+                int x;scanf("%d",&x);
+                if (node = RightChild(I->T, x))
                 {
                     printf("右孩子的值为%c.\n", node->data);
                 }
@@ -311,6 +349,8 @@ int main(int argc, char *argv[])
             }
             system("pause");
             break;
+
+            /*寻找左兄弟*/
         case 13:
             printf("Please input tree name:");
             scanf("%s", treeName);
@@ -330,6 +370,8 @@ int main(int argc, char *argv[])
             }
             system("pause");
             break;
+
+            /*寻找右兄弟*/
         case 14:
             printf("Please input tree name:");
             scanf("%s", treeName);
@@ -349,15 +391,17 @@ int main(int argc, char *argv[])
             }
             system("pause");
             break;
+
+            /*插入子树*/
         case 15:
             printf("Please input tree name:");
             scanf("%s", treeName);
             getchar();
             if (I = SearchBiTree(P, treeName))
             {
-                printf("请输入元素值：");
-                e = getchar();
-                if (node = Value(I->T, e))
+                printf("请输入索引值：");
+                int x;scanf("%d" ,&x);
+                if (node = Value(I->T, x))
                 {
                     printf("要插入左子树(0)还是右子树(1)？");
                     scanf("%d", &LR);
@@ -382,15 +426,17 @@ int main(int argc, char *argv[])
             }
             system("pause");
             break;
+
+            /*删除子树*/
         case 16:
             printf("Please input tree name:");
             scanf("%s", treeName);
             getchar();
             if (I = SearchBiTree(P, treeName))
             {
-                printf("请输入元素值：");
-                e = getchar();
-                if (node = Value(I->T, e))
+                printf("请输入索引值：");
+                int x;scanf("%d" ,&x);
+                if (node = Value(I->T, x))
                 {
                     printf("要删除左子树(0)还是右子树(1)？");
                     scanf("%d", &LR);
@@ -410,6 +456,8 @@ int main(int argc, char *argv[])
             }
             system("pause");
             break;
+
+            /*先序遍历二叉树*/
         case 17:
             printf("Please input tree name:");
             scanf("%s", treeName);
@@ -420,6 +468,8 @@ int main(int argc, char *argv[])
             }
             system("pause");
             break;
+
+            /*中序遍历二叉树*/
         case 18:
             printf("Please input tree name:");
             scanf("%s", treeName);
@@ -430,6 +480,8 @@ int main(int argc, char *argv[])
             }
             system("pause");
             break;
+
+            /*后序遍历二叉树*/
         case 19:
             printf("Please input tree name:");
             scanf("%s", treeName);
@@ -440,6 +492,8 @@ int main(int argc, char *argv[])
             }
             system("pause");
             break;
+
+            /*层序遍历二叉树*/
         case 20:
             printf("Please input tree name:");
             scanf("%s", treeName);
@@ -450,6 +504,8 @@ int main(int argc, char *argv[])
             }
             system("pause");
             break;
+
+            /*形象展示二叉树*/
         case 21:
             printf("Please input tree name:");
             scanf("%s", treeName);
@@ -460,6 +516,8 @@ int main(int argc, char *argv[])
             }
             system("pause");
             break;
+
+            /*退出*/
         case 0:
             printf("是否要保存二叉树？y/[n]\n");
             if (getchar() == 'y')
@@ -481,7 +539,8 @@ int main(int argc, char *argv[])
         }
     }
 }
-status InitBiTree(IndexNode &P, char *name){
+status InitBiTree(PNode &P, char *name)
+{
     if (P.length >= P.size)
     {
         InfoNode *newbase;
@@ -499,7 +558,8 @@ status InitBiTree(IndexNode &P, char *name){
     P.length++;
     return OK;
 }
-status DestroyBiTree(IndexNode &P, char *name){
+status DestroyBiTree(PNode &P, char *name)
+{
     for (int i = 0; i < P.length; i++)
     {
         if (strcmp(P.elem[i].name, name) == 0)
@@ -516,7 +576,8 @@ status DestroyBiTree(IndexNode &P, char *name){
     }
     return ERROR;
 }
-status CreateBiTree(BiTree &T, char *defination, int &index){
+status CreateBiTree(BiTree &T, char *defination, int &index)
+{
     if (defination[index++] != ' ' && defination[index - 1] != '\n')
     {
         if (!(T = (BiTNode *)malloc(sizeof(BiTNode))))
@@ -524,15 +585,16 @@ status CreateBiTree(BiTree &T, char *defination, int &index){
             exit(OVERFLOW);
         }
         T->data = defination[index - 1];
-        T->num = index;
+        T->key = index;
         T->lchild = NULL;
         T->rchild = NULL;
-        CreateBiTree(T->lchild, defination, index);     //递归创建左子树
-        CreateBiTree(T->rchild, defination, index);     //递归创建右子树
+        CreateBiTree(T->lchild, defination, index);
+        CreateBiTree(T->rchild, defination, index);
     }
     return OK;
 }
-status ClearBiTree(BiTree &T){
+status ClearBiTree(BiTree &T)
+{
     if (T)
     {
         ClearBiTree(T->lchild);
@@ -542,7 +604,8 @@ status ClearBiTree(BiTree &T){
     }
     return OK;
 }
-status BiTreeEmpty(BiTree T){
+status BiTreeEmpty(BiTree T)
+{
     if (T == NULL)
     {
         return TRUE;
@@ -552,7 +615,8 @@ status BiTreeEmpty(BiTree T){
         return FALSE;
     }
 }
-int BiTreeDepth(BiTree T){
+int BiTreeDepth(BiTree T)
+{
     if (T == NULL)
     {
         return 0;
@@ -561,7 +625,8 @@ int BiTreeDepth(BiTree T){
     int rightDepth = BiTreeDepth(T->rchild);
     return (leftDepth >= rightDepth) ? leftDepth + 1 : rightDepth + 1;
 }
-status Root(BiTree T, TElemType &e){
+status Root(BiTree T, TElemType &e)
+{
     if (T)
     {
         e = T->data;
@@ -569,36 +634,38 @@ status Root(BiTree T, TElemType &e){
     }
     return ERROR;
 }
-BiTNode * Value(BiTree T, int index){
+BiTNode * Value(BiTree T, int x)
+{
     if (T == NULL)
     {
         return NULL;
     }
-    if (T->num == index)
+    if (T->key == x)
     {
         return T;
     }
-
     BiTNode *node;
-    if (node = Value(T->lchild, index))
+    if (node = Value(T->lchild, x))
     {
         return node;
     }
     else
     {
-        return Value(T->rchild, index);
+        return Value(T->rchild, x);
     }
 }
-status Assign(BiTree T, TElemType &e, TElemType value){
+status Assign(BiTree T,int x, TElemType value)
+{
     BiTNode *node;
-    if (node = Value(T, e))
+    if (node = Value(T, x))
     {
         node->data = value;
         return OK;
     }
     return ERROR;
 }
-BiTNode *Parent(BiTree T, TElemType e){
+BiTNode *Parent(BiTree T, TElemType e)
+{
     if (T == NULL)
     {
         return NULL;
@@ -629,23 +696,26 @@ BiTNode *Parent(BiTree T, TElemType e){
     }
     return NULL;
 }
-BiTNode *LeftChild(BiTree T, TElemType e){
-    BiTNode *node = Value(T, e);
+BiTNode *LeftChild(BiTree T, int x)
+{
+    BiTNode *node = Value(T, x);
     if (node)
     {
         return node->lchild;
     }
     return NULL;
 }
-BiTNode *RightChild(BiTree T, TElemType e){
-    BiTNode *node = Value(T, e);
+BiTNode *RightChild(BiTree T, int x)
+{
+    BiTNode *node = Value(T, x);
     if (node)
     {
         return node->rchild;
     }
     return NULL;
 }
-BiTNode *LeftSibling(BiTree T, TElemType e){
+BiTNode *LeftSibling(BiTree T, TElemType e)
+{
     BiTNode *node = Parent(T, e);
     if (node && node->lchild && node->lchild->data != e)
     {
@@ -653,7 +723,8 @@ BiTNode *LeftSibling(BiTree T, TElemType e){
     }
     return NULL;
 }
-BiTNode *RightSibling(BiTree T, TElemType e){
+BiTNode *RightSibling(BiTree T, TElemType e)
+{
     BiTNode *node = Parent(T, e);
     if (node && node->rchild && node->rchild->data != e)
     {
@@ -661,7 +732,8 @@ BiTNode *RightSibling(BiTree T, TElemType e){
     }
     return NULL;
 }
-status InsertChild(BiTree T, BiTNode *p, int LR, BiTree c){
+status InsertChild(BiTree T, BiTNode *p, int LR, BiTree c)
+{
     if (!c || c->rchild)
     {
         return ERROR;
@@ -678,7 +750,8 @@ status InsertChild(BiTree T, BiTNode *p, int LR, BiTree c){
     }
     return OK;
 }
-status DeleteChild(BiTree T, BiTNode *p, int LR){
+status DeleteChild(BiTree T, BiTNode *p, int LR)
+{
     if (LR == 0)
     {
         ClearBiTree(p->lchild);
@@ -689,7 +762,8 @@ status DeleteChild(BiTree T, BiTNode *p, int LR){
     }
     return OK;
 }
-status PreOrderTraverse(BiTree T){
+status PreOrderTraverse(BiTree T)
+{
     if (T == NULL)
     {
         return OK;
@@ -702,7 +776,7 @@ status PreOrderTraverse(BiTree T){
     {
         length--;
         node = stack[length];
-        printf("%c-%d ", node->data,node->num);
+        printf("%c ", node->data);
         if (stack[length] = node->rchild)
         {
             length++;
@@ -714,27 +788,30 @@ status PreOrderTraverse(BiTree T){
     }
     return OK;
 }
-status InOrderTraverse(BiTree T){
+status InOrderTraverse(BiTree T)
+{
     if (T == NULL)
     {
         return OK;
     }
     InOrderTraverse(T->lchild);
-    printf("%c-%d ", T->data,T->num);
+    printf("%c ", T->data);
     InOrderTraverse(T->rchild);
     return OK;
 }
-status PostOrderTraverse(BiTree T){
+status PostOrderTraverse(BiTree T)
+{
     if (T == NULL)
     {
         return OK;
     }
     PostOrderTraverse(T->lchild);
     PostOrderTraverse(T->rchild);
-    printf("%c-%d ", T->data,T->num);
+    printf("%c ", T->data);
     return OK;
 }
-status LevelOrderTraverse(BiTree T){
+status LevelOrderTraverse(BiTree T)
+{
     BiTNode *queue[300];
     BiTNode *node;
     int head = 0, rear = 0;
@@ -757,7 +834,8 @@ status LevelOrderTraverse(BiTree T){
     }
     return OK;
 }
-status Display(BiTree T, int depth){
+status Display(BiTree T, int depth)
+{
     if (T == NULL)
     {
         return OK;
@@ -771,7 +849,8 @@ status Display(BiTree T, int depth){
     Display(T->rchild, depth + 1);
     return OK;
 }
-InfoNode *SearchBiTree(IndexNode P, char *name){
+InfoNode *SearchBiTree(PNode P, char *name)
+{
     for (int i = 0; i < P.length; i++)
     {
         if (strcmp(P.elem[i].name, name) == 0)
@@ -782,7 +861,8 @@ InfoNode *SearchBiTree(IndexNode P, char *name){
     printf("未找到二叉树！\n");
     return NULL;
 }
-status LoadFile(IndexNode &P, char *filename){
+status LoadFile(PNode &P, char *filename)
+{
     FILE *fp;
     char treeName[40];
     char definition[256];
@@ -811,7 +891,8 @@ status LoadFile(IndexNode &P, char *filename){
         return ERROR;
     }
 }
-status SaveFile(IndexNode P, char *filename){
+status SaveFile(PNode P, char *filename)
+{
     FILE *fp;
     if (fp = fopen(filename, "w"))
     {
@@ -828,7 +909,8 @@ status SaveFile(IndexNode P, char *filename){
         return ERROR;
     }
 }
-status fprintfDefinition(BiTree T, FILE *fp){
+status fprintfDefinition(BiTree T, FILE *fp)
+{
     if (T)
     {
         fputc(T->data, fp);
